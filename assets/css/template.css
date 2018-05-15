@@ -1,6 +1,7 @@
 body{
 	margin:0;
 	height:100vh;
+	font-family:Arial;
 }
 .container{
 	display: flex;
@@ -14,11 +15,10 @@ nav{
 }
 section{
 	flex:1;
-	background-color: #EEE;
+	display:flex;
 }
 footer{
-	height:100px;
-	background-color: #CCC;
+	height:84px;
 }
 nav ul,
 nav li{
@@ -82,4 +82,51 @@ nav li.active{
 }
 .active_group{
 	background-color:#EEE !important; 
+}
+.messages{
+	flex:1;
+	overflow-y:auto;
+}
+.message{
+	padding:5px;
+	border-bottom:1px solid #DDD;
+}
+.m_info{
+	margin-bottom:5px;
+}
+.m_sender{
+	font-size:14px;
+	font-weight:bold;
+	color:#000;
+}
+.m_date{
+	font-size:12px;
+	color:#777;
+}
+.m_body{
+	font-size:12px;
+}
+.sender_area{
+	height:40px;
+	border:2px solid #999;
+	margin:20px;
+	border-radius:5px;
+	display:flex;
+	overflow:hidden;
+}
+#sender_input{
+	border:0;
+	font-size:13px;
+	color:#000;
+	padding-left:10px;
+	outline:0;
+	flex:1;
+}
+.sender_tools{
+	width:40px;
+}
+.sender_tool{
+	width:40px;
+	height:40px;
+	background-color:#CCC;
 }
