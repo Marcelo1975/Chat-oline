@@ -27,7 +27,7 @@ function addGrupoModal() {
 }
 
 $(function(){
-
+	chat.chatActivity();
 	$('.add_tab').on('click', function(){
 
 		var html = '<h1>Escolha uma sala de Bate Papo</h1>';
@@ -54,9 +54,13 @@ $(function(){
 		});
 	});
 
-	$('nav ul').on('click', 'li', function(){
-		var id = $(this).attr('data-id');
+	$('nav ul').on('click', 'li .group_name', function(){
+		var id = $(this).parent().attr('data-id');
 		chat.setActiveGroup(id);
+	});
+	$('nav ul').on('click', 'li .group_close', function(){
+		var id = $(this).parent().attr('data-id');
+		chat.removeGroup(id);
 	});
 
 	$('#sender_input').on('keyup', function(e){

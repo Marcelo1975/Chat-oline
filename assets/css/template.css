@@ -36,6 +36,7 @@ nav li{
 	text-align: center;
 	line-height: 50px;
 	cursor: pointer;
+	display:flex;
 }
 nav li:hover{
 	background-color: #DDD;
@@ -43,6 +44,12 @@ nav li:hover{
 nav li.active{
 	background-color: #EEE;
 	font-weight: bold;
+}
+nav li .group_close{
+	width:30px;
+}
+nav li .group_name{
+	flex:1;
 }
 .add_tab{
 	width: 50px;

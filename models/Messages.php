@@ -13,7 +13,12 @@ class Messages extends Model{
 	public function get($last_time, $groups){
 		$array = array();
 
-		$sql = "SELECT * FROM messages WHERE date_msg > :date_msg AND id_group IN (".(implode(',', $groups)).")";
+		$sql = "SELECT
+		messages.*,
+		users.username
+		FROM messages
+		LEFT JOIN users ON users.id = messages.id_user 
+		WHERE date_msg > :date_msg AND id_group IN (".(implode(',', $groups)).")";
 		$sql = $this->db->prepare($sql);
 		$sql->bindValue(':date_msg', $last_time);
 		$sql->execute();

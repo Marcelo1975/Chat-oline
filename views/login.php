@@ -15,7 +15,7 @@
 			<?php endif; ?>
 			<form method="POST" autocomplete="off" action="<?php echo BASE_URL; ?>login/signin">
 				Usuário:<br/>
-				<input type="text" name="username" /><br/><br/>
+				<input type="text" name="username" autofocus /><br/><br/>
 
 				Senha:<br/>
 				<input type="password" name="pass" /><br/><br/>

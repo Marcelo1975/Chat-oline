@@ -2,6 +2,8 @@ var chat = {
 
 	groups:[],
 	activeGroup:0,
+	lastTime:'',
+	msgRequest:null,
 
 	setGroup:function(id, name) {
 		var found = false;
@@ -16,10 +18,7 @@ var chat = {
 			this.groups.push({
 				id:id,
 				name:name,
-				messages:[
-					{id:1, sender_id:1, sender_name:'Marcelo', sender_date:'9:35', msg:'Oi, tudo bem?'},
-					{id:2, sender_id:1, sender_name:'Marcelo', sender_date:'9:37', msg:'Alguma novidade no grupo '+name+'?'}
-				]
+				messages:[]
 			});
 		}
 
@@ -28,6 +27,28 @@ var chat = {
 		}
 
 		this.updateGroupView();
+
+		if(this.msgRequest != null){
+			this.msgRequest.abort();
+		}
+	},
+	removeGroup:function(id){
+		for(var i in this.groups) {
+			if(this.groups[i].id == id) {
+				this.groups.splice(i, 1);
+			}
+		}
+		if(this.activeGroup == id){
+			if(this.groups.length > 0){
+				this.setActiveGroup(this.groups[0].id);
+			}else{
+				this.activeGroup = 0;
+			}
+		}
+		this.updateGroupView();
+		if(this.msgRequest != null){
+			this.msgRequest.abort();
+		}
 	},
 	 getGroups:function() {
 	 	return this.groups;
@@ -67,7 +88,10 @@ var chat = {
 	 updateGroupView:function() {
 	 	var html = '';
 	 	for(var i in this.groups) {
-	 		html += '<li data-id="'+this.groups[i].id+'">'+this.groups[i].name+'</li>';
+	 		html += '<li data-id="'+this.groups[i].id+'">';
+	 		html += '<div class="group_close">X</div>';
+	 		html += '<div class="group_name">'+this.groups[i].name+'</div>';
+	 		html += '</li>';
 	 	}
 	 	$('nav ul').html(html);
 	 	this.loadConversation();
@@ -135,5 +159,60 @@ var chat = {
 		 		}
 		 	});
 	 	}
+	 },
+
+	 insertMessage:function(item){
+	 	for(var i in this.groups){
+	 		if(this.groups[i].id == item.id_group){
+	 			var date_msg = item.date_msg.split(' ');
+	 			date_msg = date_msg[1];
+	 			this.groups[i].messages.push({
+	 				id:item.id,
+	 				sender_id:item.id_user,
+	 				sender_name:item.username,
+	 				sender_date:date_msg,
+	 				msg:item.msg
+	 			});
+	 		}
+	 	}
+	 },
+
+	 updateLastTime:function(last_time){
+	 	this.lastTime = last_time;
+	 },
+
+	 chatActivity:function(){
+	 	var grs = this.getGroups();
+	 	var groups = [];
+	 	for(var i in grs){
+	 		groups.push(grs[i].id);
+	 	}
+
+	 	if(groups.length > 0){
+		 	this.msgRequest = $.ajax({
+		 		url:BASE_URL+'ajax/get_messages',
+		 		type:'GET',
+		 		data:{last_time:this.lastTime, groups:groups},
+		 		dataType:'json',
+		 		success:function(json){
+		 			if(json.status == '1'){
+		 				chat.updateLastTime(json.last_time);
+		 				for(var i in json.msgs){
+		 					chat.insertMessage(json.msgs[i]);
+		 				}
+		 				chat.showMessages();
+		 			}else{
+		 				window.location.href = BASE_URL+'login';
+		 			}
+		 		},
+		 		complete:function(){
+		 			chat.chatActivity();
+		 		}
+		 	});
+		 }else{
+		 	setTimeout(function(){
+		 		chat.chatActivity();		 		
+		 	}, 1000);
+		 }
 	 }
 };
