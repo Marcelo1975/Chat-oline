@@ -1,12 +1,13 @@
 <?php
 class Messages extends Model{
 
-	public function add($uid, $id_group, $msg){
-		$sql = "INSERT INTO messages (id_user, id_group, date_msg, msg) VALUES (:uid, :id_group, NOW(), :msg)";
+	public function add($uid, $id_group, $msg, $msg_type = 'text'){
+		$sql = "INSERT INTO messages (id_user, id_group, date_msg, msg, msg_type) VALUES (:uid, :id_group, NOW(), :msg, :msg_type )";
 		$sql = $this->db->prepare($sql);
 		$sql->bindValue(':uid', $uid);
 		$sql->bindValue(':id_group', $id_group);
 		$sql->bindValue(':msg', $msg);
+		$sql->bindValue(':msg_type', $msg_type);
 		$sql->execute();
 	}
 

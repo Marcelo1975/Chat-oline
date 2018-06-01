@@ -113,6 +113,10 @@ nav li .group_name{
 .m_body{
 	font-size:12px;
 }
+.m_body img{
+	max-width:200px;
+	max-height:200px;
+}
 .sender_area{
 	height:40px;
 	border:2px solid #999;
@@ -130,10 +134,27 @@ nav li .group_name{
 	flex:1;
 }
 .sender_tools{
-	width:40px;
+	width:80px;
+	display:flex;
+	cursor:pointer;
 }
 .sender_tool{
 	width:40px;
 	height:40px;
 	background-color:#CCC;
+}
+.imgUploadBtn{
+	background-color:#FF0000;
+}
+#sender_input_img{
+	position:absolute;
+	top:-1000px;
+}
+.progress{
+	height:10px;
+	display:none;
+}
+.progressbar{
+	height:10px;
+	background-color:#FF0000;
 }

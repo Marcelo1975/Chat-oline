@@ -70,4 +70,12 @@ $(function(){
 			chat.sendMessage(msg);
 		}
 	});
+
+	$('.imgUploadBtn').on('click', function(){
+		$('#sender_input_img').trigger('click');
+	});
+
+	$('#sender_input_img').on('change', function(e){
+		chat.sendPhoto(e.target.files[0]);
+	});
 });

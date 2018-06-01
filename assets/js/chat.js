@@ -133,7 +133,11 @@ var chat = {
 				html += '<span class="m_date">'+msgs[i].sender_date+'</span>';
 				html += '</div>';
 				html += '<div class="m_body">';
-				html += msgs[i].msg;
+				if(msgs[i].msg_type == 'text'){
+					html += msgs[i].msg;
+				}else if(msgs[i].msg_type == 'img'){
+					html += '<img src="'+BASE_URL+'media/images/'+msgs[i].msg+'" />';
+				}
 				html += '</div>';
 			    html += '</div>';
 
@@ -161,6 +165,58 @@ var chat = {
 	 	}
 	 },
 
+	 sendPhoto:function(img){
+	 	if(this.activeGroup != 0){
+		 	var formData = new FormData();
+		 	formData.append('img', img);
+		 	formData.append('id_group', this.activeGroup);
+
+		 	$.ajax({
+		 		url:BASE_URL+'ajax/add_photo',
+		 		type:'POST',
+		 		dataType:'json',
+		 		data:formData,
+		 		contentType:false,
+		 		processData:false,
+		 		success:function(json){
+		 			if(json.status == '1') {
+		 				if(json.error == '1'){
+		 					alert(json.errorMsg);
+		 				}
+		 			} else {
+		 				window.location.href = BASE_URL+'login';
+		 			}
+		 		},
+		 		xhr:function(){
+		 			var xhrPadrao = $.ajaxSettings.xhr();
+		 			if(xhrPadrao.uplaod){
+		 				xhrPadrao.uplaod.addEventListener('progress', function(p){
+		 					var total = p.total;
+		 					var loaded = p.loaded;
+		 					var pct = (total/loaded) * 100;
+
+		 					if(pcts > 0){
+		 						$('.progressbar').css('width', pct+'%');
+		 						$('.progress').show();
+		 					}
+		 					
+		 					if(pcts >= 100){
+		 						$('.progressbar').css('width', '0%');
+		 						$('.progress').hide();	
+		 					}
+
+		 				}, false);
+		 			}
+		 			return xhrPadrao;
+		 		}
+		 	});
+		 }
+	 },
+
+	 updateLastTime:function(last_time){
+	 	this.lastTime = last_time;
+	 },
+
 	 insertMessage:function(item){
 	 	for(var i in this.groups){
 	 		if(this.groups[i].id == item.id_group){
@@ -171,14 +227,11 @@ var chat = {
 	 				sender_id:item.id_user,
 	 				sender_name:item.username,
 	 				sender_date:date_msg,
-	 				msg:item.msg
+	 				msg:item.msg,
+	 				msg_type:item.msg_type
 	 			});
 	 		}
 	 	}
-	 },
-
-	 updateLastTime:function(last_time){
-	 	this.lastTime = last_time;
 	 },
 
 	 chatActivity:function(){

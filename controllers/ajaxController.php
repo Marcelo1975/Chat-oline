@@ -54,10 +54,48 @@ class ajaxController extends Controller {
             $msg = $_POST['msg'];
             $id_group = $_POST['id_group'];
             $uid = $this->user->getUid();
-            $messages->add($uid, $id_group, $msg);
+            $messages->add($uid, $id_group, $msg, 'text');
         }else{
             $array['error'] = '1';
             $array['errorMsg'] = 'Mensagem vazia';
+        }
+
+        echo json_encode($array);
+        exit;
+    }
+
+    public function add_photo(){
+        $array = array('status' => '1', 'error' => '0');
+        $messages = new Messages();
+
+        if(!empty($_POST['id_group'])){
+            $id_group = $_POST['id_group'];
+            $uid = $this->user->getUid();
+
+            $allowed = array('image/jpeg', 'image/jpg', 'image/png');
+            if(!empty($_FILES['img']['tmp_name'])){
+                if(in_array($_FILES['img']['type'], $allowed)){
+                    $newName = md5(time().rand(0,9999));
+                    if($_FILES['img']['type'] == 'image/png'){
+                        $newName .= '.png';
+                    }else{
+                        $newName .= 'jpg';
+                    }
+
+                    move_uploaded_file($_FILES['img']['tmp_name'], 'media/images/'.$newName);
+
+                    $messages->add($uid, $id_group, $newName, 'img');
+                }else{
+                    $array['error'] = '1';
+                    $array['errorMsg'] = 'Arquivo Inválido';                    
+                }
+            }else{                
+                $array['error'] = '1';
+                $array['errorMsg'] = 'Arquivo em branco';
+            }
+        }else{
+            $array['error'] = '1';
+            $array['errorMsg'] = 'Grupo Inválido';
         }
 
         echo json_encode($array);
