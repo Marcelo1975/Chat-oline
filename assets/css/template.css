@@ -158,3 +158,10 @@ nav li .group_name{
 	height:10px;
 	background-color:#FF0000;
 }
+.userinfo{
+	height:25px;
+	font-size:12px;
+	line-height:25px;
+	padding-left:10px;
+	background-color:#EEE;
+}

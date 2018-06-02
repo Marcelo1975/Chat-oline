@@ -15,7 +15,9 @@ class homeController extends Controller {
 	}
 
     public function index() {
-        $data = array();
+        $data = array(
+        	'name' => $this->user->getName()
+        );
 
         $this->loadTemplate('home', $data);
     }

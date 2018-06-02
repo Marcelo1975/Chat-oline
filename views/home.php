@@ -2,6 +2,9 @@
 	<div class="progress">
 		<div class="progressbar" style="width:0%"></div>
 	</div>
+	<div class="userinfo">
+		Bem Vindo(a): <strong><?php echo $name; ?></strong> - <a href="<?php echo BASE_URL; ?>login/logout">sair</a>
+	</div>
 	<nav>
 		<ul>
 			
