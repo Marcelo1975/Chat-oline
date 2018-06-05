@@ -16,7 +16,8 @@ class homeController extends Controller {
 
     public function index() {
         $data = array(
-        	'name' => $this->user->getName()
+        	'name' => $this->user->getName(),
+        	'current_groups' => $this->user->getCurrentGroups()
         );
 
         $this->loadTemplate('home', $data);

@@ -90,6 +90,20 @@ nav li .group_name{
 .active_group{
 	background-color:#EEE !important; 
 }
+.user_list{
+	width:200px;
+	border-left:2px solid #CCC;
+	overflow-y:auto;
+}
+.user_list ul,
+.user_list li{
+	list-style:none;
+	margin:0;
+	padding:0;
+}
+.user_list li{
+	padding:3px;
+}
 .messages{
 	flex:1;
 	overflow-y:auto;
@@ -143,8 +157,9 @@ nav li .group_name{
 	height:40px;
 	background-color:#CCC;
 }
-.imgUploadBtn{
-	background-color:#FF0000;
+.imgUploadBtn img{
+	width:40px;
+	height:40px;
 }
 #sender_input_img{
 	position:absolute;

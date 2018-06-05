@@ -27,7 +27,16 @@ function addGrupoModal() {
 }
 
 $(function(){
+
+	if(group_list.length > 0){
+		for(var i in group_list){
+			chat.setGroup(group_list[i]. id, group_list[i].name);
+		}
+	}
+
 	chat.chatActivity();
+	chat.userListActivity();
+
 	$('.add_tab').on('click', function(){
 
 		var html = '<h1>Escolha uma sala de Bate Papo</h1>';

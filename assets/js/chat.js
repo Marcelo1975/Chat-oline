@@ -4,6 +4,7 @@ var chat = {
 	activeGroup:0,
 	lastTime:'',
 	msgRequest:null,
+	userRequest:null,
 
 	setGroup:function(id, name) {
 		var found = false;
@@ -18,7 +19,8 @@ var chat = {
 			this.groups.push({
 				id:id,
 				name:name,
-				messages:[]
+				messages:[],
+				users:[]
 			});
 		}
 
@@ -50,84 +52,102 @@ var chat = {
 			this.msgRequest.abort();
 		}
 	},
-	 getGroups:function() {
-	 	return this.groups;
-	 },
-	 loadGroupList:function(ajaxCallback) {
-	 	
-	 	$.ajax({
-	 		url:BASE_URL+'ajax/get_groups',
-	 		type:'GET',
-	 		dataType:'json',
-	 		success:function(json) {
-	 			if(json.status == '1') {
-	 				this.groupList = json.list;
-	 				ajaxCallback(json);
-	 			} else {
-	 				window.location.href = BASE_URL+'login';
-	 			}
-	 		}
-	 	});
-	 },
-	 addNewGroup:function(groupName, ajaxCallback){
-	 	$.ajax({
-	 		url:BASE_URL+'ajax/add_group',
-	 		type:'POST',
-	 		data:{name:groupName},
-	 		dataType:'json',
-	 		success:function(json) {
-	 			if(json.status == '1') {
-	 				this.groupList = json.list;
-	 				ajaxCallback(json);
-	 			} else {
-	 				window.location.href = BASE_URL+'login';
-	 			}
-	 		}
-	 	});
-	 },
-	 updateGroupView:function() {
-	 	var html = '';
-	 	for(var i in this.groups) {
-	 		html += '<li data-id="'+this.groups[i].id+'">';
-	 		html += '<div class="group_close">X</div>';
-	 		html += '<div class="group_name">'+this.groups[i].name+'</div>';
-	 		html += '</li>';
-	 	}
-	 	$('nav ul').html(html);
-	 	this.loadConversation();
-	 },
-	 setActiveGroup:function(id) {
-	 	this.activeGroup = id;
-	 	this.loadConversation();
-	 },
-	 getActiveGroup:function(){
-	 	return this.activeGroup;
-	 },
-	 loadConversation:function(){
-	 	if(this.activeGroup != 0){
-		 	$('nav ul').find('.active_group').removeClass('active_group');
-		 	$('nav ul').find('li[data-id='+this.activeGroup+']').addClass('active_group');
-		 }
+	getGroups:function() {
+		return this.groups;
+	},
+	loadGroupList:function(ajaxCallback) {
 
-	 	//Pegar a conversa daquele grupo
+		$.ajax({
+			url:BASE_URL+'ajax/get_groups',
+			type:'GET',
+			dataType:'json',
+			success:function(json) {
+				if(json.status == '1') {
+					this.groupList = json.list;
+					ajaxCallback(json);
+				} else {
+					window.location.href = BASE_URL+'login';
+				}
+			}
+		});
+	},
+	addNewGroup:function(groupName, ajaxCallback){
+		$.ajax({
+			url:BASE_URL+'ajax/add_group',
+			type:'POST',
+			data:{name:groupName},
+			dataType:'json',
+			success:function(json) {
+				if(json.status == '1') {
+					this.groupList = json.list;
+					ajaxCallback(json);
+				} else {
+					window.location.href = BASE_URL+'login';
+				}
+			}
+		});
+	},
+	updateGroupView:function() {
+		var html = '';
+		for(var i in this.groups) {
+			html += '<li data-id="'+this.groups[i].id+'">';
+			html += '<div class="group_close">X</div>';
+			html += '<div class="group_name">'+this.groups[i].name+'</div>';
+			html += '</li>';
+		}
+		$('nav ul').html(html);
+		this.loadConversation();
+	},
+	setActiveGroup:function(id) {
+		this.activeGroup = id;
+		this.loadConversation();
+	},
+	getActiveGroup:function(){
+		return this.activeGroup;
+	},
+	loadConversation:function(){
+		if(this.activeGroup != 0){
+			$('nav ul').find('.active_group').removeClass('active_group');
+			$('nav ul').find('li[data-id='+this.activeGroup+']').addClass('active_group');
+		}
 
-	 	this.showMessages();
-	 },
+		this.showMessages();
+		this.showUserList();
+	},
 
-	 showMessages:function(){
-	 	$('.messages').html('');
+	showUserList:function(){
+		if(this.activeGroup != 0){
+			for(var i in this.groups){
+				if(this.groups[i].id == this.activeGroup){
+					users = this.groups[i].users;
+				}
+			}
 
-	 	if(this.activeGroup != 0){
-	 		var msgs = [];
+			var html = '';
+			for(var i in users){
+				html += '<li>'+users[i]+'</li>';
+			}
 
-	 		for(var i in this.groups){
-	 			if(this.groups[i].id == this.activeGroup){
-	 				msgs = this.groups[i].messages;
-	 			}
-	 		}
+			$('.user_list ul').html(html);
+		}else{
+			$('.user_list ul').html('');	
+		}
+	},
 
-	 		for(var i in msgs){
-	 			var html = '<div class="message">';
+	showMessages:function(){
+		$('.messages').html('');
+
+		if(this.activeGroup != 0){
+			var msgs = [];
+
+			for(var i in this.groups){
+				if(this.groups[i].id == this.activeGroup){
+					msgs = this.groups[i].messages;
+				}
+			}
+
+			for(var i in msgs){
+				var html = '<div class="message">';
 				html += '<div class="m_info">';
 				html += '<span class="m_sender">'+msgs[i].sender_name+'</span>';
 				html += '<span class="m_date">'+msgs[i].sender_date+'</span>';
@@ -139,133 +159,179 @@ var chat = {
 					html += '<img src="'+BASE_URL+'media/images/'+msgs[i].msg+'" />';
 				}
 				html += '</div>';
-			    html += '</div>';
+				html += '</div>';
 
 				$('.messages').append(html);
-	 		}
-	 	}
-	 },
-	 sendMessage:function(msg){
-	 	if(msg.length > 0 && this.activeGroup != 0){
-	 		$.ajax({
-		 		url:BASE_URL+'ajax/add_message',
-		 		type:'POST',
-		 		data:{id_group:this.activeGroup, msg:msg},
-		 		dataType:'json',
-		 		success:function(json) {
-		 			if(json.status == '1') {
-		 				if(json.error == '1'){
-		 					alert(json.errorMsg);
-		 				}
-		 			} else {
-		 				window.location.href = BASE_URL+'login';
-		 			}
-		 		}
-		 	});
-	 	}
-	 },
+			}
+		}
+	},
+	sendMessage:function(msg){
+		if(msg.length > 0 && this.activeGroup != 0){
+			$.ajax({
+				url:BASE_URL+'ajax/add_message',
+				type:'POST',
+				data:{id_group:this.activeGroup, msg:msg},
+				dataType:'json',
+				success:function(json) {
+					if(json.status == '1') {
+						if(json.error == '1'){
+							alert(json.errorMsg);
+						}
+					} else {
+						window.location.href = BASE_URL+'login';
+					}
+				}
+			});
+		}
+	},
 
-	 sendPhoto:function(img){
-	 	if(this.activeGroup != 0){
-		 	var formData = new FormData();
-		 	formData.append('img', img);
-		 	formData.append('id_group', this.activeGroup);
+	sendPhoto:function(img){
+		if(this.activeGroup != 0){
+			var formData = new FormData();
+			formData.append('img', img);
+			formData.append('id_group', this.activeGroup);
 
-		 	$.ajax({
-		 		url:BASE_URL+'ajax/add_photo',
-		 		type:'POST',
-		 		dataType:'json',
-		 		data:formData,
-		 		contentType:false,
-		 		processData:false,
-		 		success:function(json){
-		 			if(json.status == '1') {
-		 				if(json.error == '1'){
-		 					alert(json.errorMsg);
-		 				}
-		 			} else {
-		 				window.location.href = BASE_URL+'login';
-		 			}
-		 		},
-		 		xhr:function(){
-		 			var xhrPadrao = $.ajaxSettings.xhr();
-		 			if(xhrPadrao.uplaod){
-		 				xhrPadrao.uplaod.addEventListener('progress', function(p){
-		 					var total = p.total;
-		 					var loaded = p.loaded;
-		 					var pct = (total/loaded) * 100;
+			$.ajax({
+				url:BASE_URL+'ajax/add_photo',
+				type:'POST',
+				dataType:'json',
+				data:formData,
+				contentType:false,
+				processData:false,
+				success:function(json){
+					if(json.status == '1') {
+						if(json.error == '1'){
+							alert(json.errorMsg);
+						}
+					} else {
+						window.location.href = BASE_URL+'login';
+					}
+				},
+				xhr:function(){
+					var xhrPadrao = $.ajaxSettings.xhr();
+					if(xhrPadrao.uplaod){
+						xhrPadrao.uplaod.addEventListener('progress', function(p){
+							var total = p.total;
+							var loaded = p.loaded;
+							var pct = (total/loaded) * 100;
 
-		 					if(pcts > 0){
-		 						$('.progressbar').css('width', pct+'%');
-		 						$('.progress').show();
-		 					}
-		 					
-		 					if(pcts >= 100){
-		 						$('.progressbar').css('width', '0%');
-		 						$('.progress').hide();	
-		 					}
+							if(pcts > 0){
+								$('.progressbar').css('width', pct+'%');
+								$('.progress').show();
+							}
 
-		 				}, false);
-		 			}
-		 			return xhrPadrao;
-		 		}
-		 	});
-		 }
-	 },
+							if(pcts >= 100){
+								$('.progressbar').css('width', '0%');
+								$('.progress').hide();	
+							}
 
-	 updateLastTime:function(last_time){
-	 	this.lastTime = last_time;
-	 },
+						}, false);
+					}
+					return xhrPadrao;
+				}
+			});
+		}
+	},
 
-	 insertMessage:function(item){
-	 	for(var i in this.groups){
-	 		if(this.groups[i].id == item.id_group){
-	 			var date_msg = item.date_msg.split(' ');
-	 			date_msg = date_msg[1];
-	 			this.groups[i].messages.push({
-	 				id:item.id,
-	 				sender_id:item.id_user,
-	 				sender_name:item.username,
-	 				sender_date:date_msg,
-	 				msg:item.msg,
-	 				msg_type:item.msg_type
-	 			});
-	 		}
-	 	}
-	 },
+	updateLastTime:function(last_time){
+		this.lastTime = last_time;
+	},
 
-	 chatActivity:function(){
-	 	var grs = this.getGroups();
-	 	var groups = [];
-	 	for(var i in grs){
-	 		groups.push(grs[i].id);
-	 	}
+	updateUserList:function(list, id_group){
+		for(var i in this.groups){
+			if(this.groups[i].id == id_group){
+				if(this.groups[i].id == id_group){
+					this.groups[i].users = list;
+				}
+			}
+		}
+	},
 
-	 	if(groups.length > 0){
-		 	this.msgRequest = $.ajax({
-		 		url:BASE_URL+'ajax/get_messages',
-		 		type:'GET',
-		 		data:{last_time:this.lastTime, groups:groups},
-		 		dataType:'json',
-		 		success:function(json){
-		 			if(json.status == '1'){
-		 				chat.updateLastTime(json.last_time);
-		 				for(var i in json.msgs){
-		 					chat.insertMessage(json.msgs[i]);
-		 				}
-		 				chat.showMessages();
-		 			}else{
-		 				window.location.href = BASE_URL+'login';
-		 			}
-		 		},
-		 		complete:function(){
-		 			chat.chatActivity();
-		 		}
-		 	});
-		 }else{
-		 	setTimeout(function(){
-		 		chat.chatActivity();		 		
-		 	}, 1000);
-		 }
-	 }
+	insertMessage:function(item){
+		for(var i in this.groups){
+			if(this.groups[i].id == item.id_group){
+				var date_msg = item.date_msg.split(' ');
+				date_msg = date_msg[1];
+				this.groups[i].messages.push({
+					id:item.id,
+					sender_id:item.id_user,
+					sender_name:item.username,
+					sender_date:date_msg,
+					msg:item.msg,
+					msg_type:item.msg_type
+				});
+			}
+		}
+	},
+
+	chatActivity:function(){
+		var grs = this.getGroups();
+		var groups = [];
+		for(var i in grs){
+			groups.push(grs[i].id);
+		}
+
+		if(groups.length > 0){
+			this.msgRequest = $.ajax({
+				url:BASE_URL+'ajax/get_messages',
+				type:'GET',
+				data:{last_time:this.lastTime, groups:groups},
+				dataType:'json',
+				success:function(json){
+					if(json.status == '1'){
+						chat.updateLastTime(json.last_time);
+						for(var i in json.msgs){
+							chat.insertMessage(json.msgs[i]);
+						}
+						chat.showMessages();
+					}else{
+						window.location.href = BASE_URL+'login';
+					}
+				},
+				complete:function(){
+					chat.chatActivity();
+				}
+			});
+		}else{
+			setTimeout(function(){
+				chat.chatActivity();		 		
+			}, 1000);
+		}
+	},
+
+	userListActivity:function(){
+		var grs = this.getGroups();
+		var groups = [];
+		for(var i in grs){
+			groups.push(grs[i].id);
+		}
+
+		if(groups.length > 0){
+			this.userRequest = $.ajax({
+				url:BASE_URL+'ajax/get_userlist',
+				type:'GET',
+				data:{groups:groups},
+				dataType:'json',
+				success:function(json){
+					if(json.status == '1'){
+						for(var i in json.users){
+							chat.updateUserList(json.users[i], i);
+						}
+						chat.showUserList();
+					}else{
+						window.location.href = BASE_URL+'login';
+					}
+				},
+				complete:function(){
+					setTimeout(function(){
+						chat.userListActivity();		 		
+					}, 5000);
+				}
+			});
+		}else{
+			setTimeout(function(){
+				chat.userListActivity();		 		
+			}, 1000);
+		}
+	}
 };

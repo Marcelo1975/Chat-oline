@@ -102,6 +102,22 @@ class ajaxController extends Controller {
         exit;
     }
 
+    public function get_userlist(){
+        $array = array('status' => '1', 'users' => array());
+
+        $groups = array();
+        if(!empty($_GET['groups']) && is_array($_GET['groups'])){
+            $groups = $_GET['groups'];
+        }
+
+        foreach ($groups as $group) {
+            $array['users'][$group] = $this->user->getUserInGroup($group);
+        }
+
+        echo json_encode($array);
+        exit;
+    }
+
     public function get_messages(){
         $array = array('status' => '1', 'msgs' => array(), 'last_time' => date('Y-m-d H:i:s'));
         $messages = new Messages();

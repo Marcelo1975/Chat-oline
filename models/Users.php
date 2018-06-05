@@ -112,8 +112,47 @@ class Users extends Model{
 		$this->db->query($sql);
 	}
 
+	public function getUserInGroup($group){
+		$array = array();
+
+		$sql = "SELECT username FROM users WHERE groups LIKE :groups";
+		$sql = $this->db->prepare($sql);
+		$sql->bindValue(':groups', '%!'.$group.'!%');
+		$sql->execute();
+
+		if($sql->rowCount() > 0){
+			$list = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+			foreach ($list as $item) {
+				$array[] = $item['username'];
+			}
+		}
+
+		return $array;
+	}
+
 	public function getUid() {
 		return $this->uid;
+	}
+
+	public function getCurrentGroups(){
+		$array = array();
+
+		$sql = "SELECT groups FROM users WHERE id = :id";
+		$sql = $this->db->prepare($sql);
+		$sql->bindValue(":id", $this->uid);
+		$sql->execute();
+		$sql = $sql->fetch();
+
+		$array = explode('!', $sql['groups']);
+		if(count($array) > 0){
+			array_pop($array);
+			array_shift($array);
+			$groups = new Groups();
+			$array = $groups->getNamesByArray($array);
+		}
+
+		return $array;
 	}
 
 	public function getName(){

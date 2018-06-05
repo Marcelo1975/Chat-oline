@@ -19,4 +19,19 @@ class Groups extends Model{
 		$sql->bindValue(":name", $name);
 		$sql->execute();
 	}
+
+	public function getNamesByArray($id_groups){
+		$array = array();
+
+		if(count($id_groups) > 0){
+			$sql = "SELECT name, id FROM groups WHERE id IN (".( implode(',', $id_groups) ).")";
+			$sql = $this->db->query($sql);
+
+			if($sql->rowCount() > 0){
+				$array = $sql->fetchAll(PDO::FETCH_ASSOC);
+			}
+		}
+
+		return $array;
+	}
 }
